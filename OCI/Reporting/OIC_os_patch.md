@@ -1,3 +1,55 @@
+# Checking OCI VM (Oracle Cloud Infrastructure Virtual Machine) OEL (Oracle Enterprise Linux) Patch Schedules
+
+To check the patch schedule for Oracle Enterprise Linux (OEL) running on OCI VMs, you have several options:
+
+## 1. Check Oracle Linux Support Policies
+- Visit Oracle's official support policy page: [Oracle Linux Support Policies](https://www.oracle.com/linux/support-policies/)
+- This shows the maintenance schedules and lifecycle for different OEL versions
+
+## 2. Use ULN (Unbreakable Linux Network) or Oracle Linux Yum Server
+For systems registered with ULN:
+```
+# List available updates
+yum list updates
+
+# Check security updates
+yum --security check-update
+
+# For detailed info on a specific update
+yum info <package_name>
+```
+
+## 3. Check OCI Console for Maintenance Notifications
+- Log in to OCI Console
+- Navigate to "Governance and Administration" > "Notifications"
+- Look for scheduled maintenance notifications
+
+## 4. Use OCI CLI to check maintenance updates
+```
+oci os-management software-source list --compartment-id <your_compartment_id>
+oci os-management scheduled-job list --compartment-id <your_compartment_id>
+```
+
+## 5. For Autonomous Linux (Oracle's managed OEL on OCI)
+```
+# Check update status
+sudo osms-agent status
+
+# Check available updates
+sudo osms-agent check-update
+```
+
+## 6. Oracle Public Yum Repository Status
+- Check the status page: [Oracle Linux Yum Status](https://yum.oracle.com/)
+
+Remember that patch schedules may vary based on:
+- Your OEL version (6, 7, 8, 9)
+- Whether you're using Unbreakable Enterprise Kernel (UEK) or Red Hat Compatible Kernel (RHCK)
+- Your specific support contract level with Oracle
+
+For the most accurate information specific to your environment, you may want to consult your Oracle support representative or check My Oracle Support (MOS) for bulletins.
+
+
 # Checking VM OS Patches for a Specific OCI Instance Using OCI CLI
 
 To display available OS patches for a specific OCI VM instance, you can use the OCI CLI with OS Management Service commands. Here's how to do it:
