@@ -625,3 +625,501 @@ sudo /usr/local/bin/generate_correlation_report.sh
 sudo firefox /var/log/tanium_ctm_correlation_report_*.html
 ```
 
+# Kernel Parameter Interactions Between Tanium Client and Control-M on OEL 9
+
+## Key Kernel Parameters Affected by Both Services
+
+### 1. Memory Management Parameters
+```bash
+# Current values can be checked with:
+sudo sysctl -a | grep -E 'vm.overcommit|vm.swappiness|vm.dirty'
+```
+
+**Commonly Impacted Parameters:**
+- `vm.overcommit_memory` (Tanium often requires 0, Control-M may need 1)
+- `vm.overcommit_ratio` (Default 50, may need adjustment)
+- `vm.swappiness` (Tanium prefers lower values, Control-M may need higher)
+- `vm.dirty_ratio`/`vm.dirty_background_ratio` (Affects filesystem caching)
+
+### 2. Process Limits
+```bash
+# Check current limits:
+sudo sysctl -a | grep -E 'kernel.pid_max|kernel.threads-max'
+```
+
+**Critical Parameters:**
+- `kernel.pid_max` (Tanium spawns many subprocesses)
+- `kernel.threads-max` (Control-M requires high thread counts)
+- `kernel.sem` (SEMAPHORES settings for IPC)
+
+## Recommended Optimizations
+
+### Baseline Configuration
+```bash
+# Add to /etc/sysctl.d/99-tanium-ctm.conf:
+vm.overcommit_memory = 1
+vm.overcommit_ratio = 75
+vm.swappiness = 30
+vm.dirty_ratio = 20
+vm.dirty_background_ratio = 10
+kernel.pid_max = 131072
+kernel.threads-max = 256000
+kernel.sem = 500 512000 64 2048
+kernel.msgmnb = 65536
+kernel.msgmax = 65536
+kernel.shmmax = 68719476736
+kernel.shmall = 4294967296
+fs.file-max = 2097152
+fs.inotify.max_user_watches = 1048576
+```
+
+### Service-Specific Tuning
+
+**For Tanium Client:**
+```bash
+# Tanium-specific optimizations
+echo "vm.vfs_cache_pressure = 50" | sudo tee -a /etc/sysctl.d/99-tanium.conf
+echo "kernel.perf_event_paranoid = -1" | sudo tee -a /etc/sysctl.d/99-tanium.conf
+```
+
+**For Control-M:**
+```bash
+# Control-M specific optimizations
+echo "kernel.sched_autogroup_enabled = 0" | sudo tee -a /etc/sysctl.d/99-ctm.conf
+echo "kernel.numa_balancing = 0" | sudo tee -a /etc/sysctl.d/99-ctm.conf
+```
+
+## Verification and Monitoring
+
+### Check Applied Parameters
+```bash
+# Verify all settings
+sudo sysctl --system
+sudo sysctl -p /etc/sysctl.d/99-tanium-ctm.conf
+
+# Monitor parameter effects
+watch -n 5 'sudo sysctl -a | grep -E "overcommit|dirty|swappiness"'
+```
+
+### Real-time Impact Monitoring
+```bash
+# Monitor kernel parameter effects
+sudo stap -e '
+probe kernel.function("mm_page_alloc") {
+    if (pid() == $1 || pid() == $2) {
+        printf("%s[%d] allocated page\n", execname(), pid())
+    }
+}' $(pgrep -f taniumclient) $(pgrep -f ctm_server)
+```
+
+## Troubleshooting Conflicts
+
+### When Parameters Collide:
+1. **Memory Overcommit Issues**:
+   ```bash
+   # Check OOM killer activity
+   sudo grep -i 'oom\|kill' /var/log/messages*
+   
+   # Temporary workaround:
+   echo 1 > /proc/sys/vm/overcommit_memory
+   ```
+
+2. **File Handle Exhaustion**:
+   ```bash
+   # Check current usage
+   cat /proc/sys/fs/file-nr
+   
+   # Increase if needed
+   echo 3000000 > /proc/sys/fs/file-max
+   ```
+
+3. **Thread Creation Failures**:
+   ```bash
+   # Monitor thread usage
+   watch -n 1 'ps -eLf | grep -E "tanium|ctm" | wc -l'
+   
+   # Increase system-wide limit
+   echo 300000 > /proc/sys/kernel/threads-max
+   ```
+
+## Persistent Configuration
+
+To make changes permanent:
+```bash
+# Apply all configurations
+sudo sysctl --system
+
+# Verify at boot
+sudo tee /etc/rc.local <<'EOF'
+#!/bin/bash
+sleep 30  # Wait for services to start
+sysctl -p /etc/sysctl.d/99-tanium-ctm.conf
+exit 0
+EOF
+sudo chmod +x /etc/rc.local
+```
+
+## Recommended Monitoring Tools
+
+1. **Track Parameter Changes**:
+   ```bash
+   sudo auditctl -w /proc/sys/vm/ -p wa -k kernel_parameters
+   ```
+
+2. **Performance Impact**:
+   ```bash
+   sudo perf stat -e 'kmem:*' -a sleep 10
+   ```
+
+3. **Service-Specific Effects**:
+   ```bash
+   sudo stap -e 'probe kernel.function("sysctl_set_value") {
+       if (pid() == $1 || pid() == $2) {
+           printf("%s modified %s to %d\n", execname(), kernel_string($2), $3)
+       }
+   }' $(pgrep -f taniumclient) $(pgrep -f ctm_server)
+   ```
+
+Remember to test changes in a staging environment before production deployment. The optimal values may vary based on your specific workload and system configuration.
+
+# Auditing Kernel Parameter Change History on OEL 9
+
+## 1. System Auditd Configuration (Recommended Method)
+
+### Set up audit rules for kernel parameters:
+```bash
+sudo tee /etc/audit/rules.d/90-kernel-params.rules <<'EOF'
+# Monitor sysctl configuration files
+-w /etc/sysctl.conf -p wa -k kernel_params
+-w /etc/sysctl.d/ -p wa -k kernel_params
+
+# Monitor /proc/sys modifications (all parameters)
+-w /proc/sys/ -p wa -k kernel_params
+
+# Monitor sysctl command usage
+-a always,exit -F arch=b64 -S sysctl -F key=kernel_params
+EOF
+
+# Restart auditd
+sudo service auditd restart
+```
+
+### View audit logs:
+```bash
+# Search for kernel parameter changes
+sudo ausearch -k kernel_params | aureport -f -i
+
+# Detailed view with timestamps
+sudo ausearch -k kernel_params --raw | aureport -f -i --interpret
+```
+
+## 2. Manual Change Tracking with Git
+
+### Initialize configuration tracking:
+```bash
+sudo mkdir /etc/sysctl.history
+sudo cp -a /etc/sysctl.conf /etc/sysctl.history/sysctl.conf.initial
+sudo git -C /etc/sysctl.history init
+sudo git -C /etc/sysctl.history add .
+sudo git -C /etc/sysctl.history commit -m "Initial sysctl configuration"
+```
+
+### Create change hook:
+```bash
+sudo tee /etc/apt/apt.conf.d/90sysctl-track <<'EOF'
+DPkg::Post-Invoke {
+    "git -C /etc/sysctl.history add /etc/sysctl* /etc/sysctl.d/* 2>/dev/null || true";
+    "git -C /etc/sysctl.history commit -m 'Auto-commit: sysctl changes' /etc/sysctl* /etc/sysctl.d/* 2>/dev/null || true";
+};
+EOF
+
+# Also track manual changes
+echo 'alias sysctl="(sysctl \$@; git -C /etc/sysctl.history add /etc/sysctl* /etc/sysctl.d/* 2>/dev/null; git -C /etc/sysctl.history commit -m \"sysctl change: \$@\" /etc/sysctl* /etc/sysctl.d/* 2>/dev/null) 2>/dev/null"' | sudo tee -a /etc/bashrc
+```
+
+### View change history:
+```bash
+sudo git -C /etc/sysctl.history log --name-only
+```
+
+## 3. Kernel Parameter Snapshot System
+
+### Create daily snapshots:
+```bash
+sudo mkdir /var/log/kernel_params
+sudo tee /usr/local/bin/snapshot_kernel_params.sh <<'EOF'
+#!/bin/bash
+DATE=$(date +%Y%m%d%H%M)
+OUTFILE="/var/log/kernel_params/snapshot_${DATE}.txt"
+
+# Collect all kernel parameters
+sysctl -a > "$OUTFILE"
+
+# Compare with previous
+LAST=$(ls -1t /var/log/kernel_params/snapshot_*.txt | head -2 | tail -1)
+if [ -f "$LAST" ]; then
+    diff -u "$LAST" "$OUTFILE" > "/var/log/kernel_params/diff_${DATE}.txt"
+fi
+
+# Keep 30 days of history
+find /var/log/kernel_params/ -name "snapshot_*.txt" -mtime +30 -delete
+find /var/log/kernel_params/ -name "diff_*.txt" -mtime +30 -delete
+EOF
+
+sudo chmod +x /usr/local/bin/snapshot_kernel_params.sh
+
+# Add to cron
+sudo tee /etc/cron.d/kernel-param-snapshots <<'EOF'
+*/30 * * * * root /usr/local/bin/snapshot_kernel_params.sh
+EOF
+```
+
+### View changes between snapshots:
+```bash
+# List available snapshots
+ls -lt /var/log/kernel_params/snapshot_*.txt
+
+# Compare two specific snapshots
+diff -y /var/log/kernel_params/snapshot_202301010000.txt /var/log/kernel_params/snapshot_202301020000.txt | less
+
+# View all changes in chronological order
+cat /var/log/kernel_params/diff_*.txt | grep '^[+-][^+-]' | sort | uniq
+```
+
+## 4. Real-time Monitoring with SystemTap
+
+### Install SystemTap:
+```bash
+sudo dnf install systemtap kernel-devel-$(uname -r)
+```
+
+### Create monitoring script:
+```bash
+sudo tee /usr/local/bin/monitor_sysctl_changes.stp <<'EOF'
+probe kernel.function("proc_dostring").return,
+      kernel.function("proc_dointvec").return,
+      kernel.function("proc_doulongvec").return,
+      kernel.function("proc_douintvec").return {
+    if ($write) {
+        printf("[%s] %s changed %s to %s (PID: %d, Command: %s)\n",
+               ctime(gettimeofday_s()),
+               uid() == 0 ? "ROOT" : sprintf("UID %d", uid()),
+               kernel_string($table->procname),
+               kernel_string($buffer),
+               pid(),
+               execname())
+    }
+}
+EOF
+
+# Run in background
+sudo nohup stap -v /usr/local/bin/monitor_sysctl_changes.stp > /var/log/sysctl_changes.log &
+```
+
+## 5. Checking Current vs. Boot Parameters
+
+### Compare current with boot-time values:
+```bash
+# Save current values
+sudo sysctl -a > /tmp/current_params.txt
+
+# Extract boot parameters from journal
+sudo journalctl -k -b 0 | grep -i "kernel:" | grep -i -E "overcommit|swappiness|dirty" > /tmp/boot_params.txt
+
+# Compare
+diff -y /tmp/boot_params.txt <(grep -E "vm.overcommit|vm.swappiness|vm.dirty" /tmp/current_params.txt)
+```
+
+## 6. Advanced: eBPF Monitoring (Requires BPF Compiler Collection)
+
+```bash
+sudo dnf install bcc-tools
+sudo /usr/share/bcc/tools/trace 'do_sysctl "%s", arg2' -U
+```
+
+## Viewing Comprehensive History
+
+Combine all methods for full visibility:
+```bash
+sudo tee /usr/local/bin/kparam_history <<'EOF'
+#!/bin/bash
+echo "=== Audit Logs ==="
+sudo ausearch -k kernel_params --raw | aureport -f -i --interpret
+
+echo -e "\n=== Git History ==="
+sudo git -C /etc/sysctl.history log -p --stat
+
+echo -e "\n=== Parameter Snapshots ==="
+ls -lt /var/log/kernel_params/diff_*.txt | head -5 | while read -r line; do
+    echo "Changes in ${line##*/}:"
+    cat "/var/log/kernel_params/${line##*/}"
+done
+
+echo -e "\n=== Recent SystemTap Changes ==="
+tail -20 /var/log/sysctl_changes.log
+EOF
+
+sudo chmod +x /usr/local/bin/kparam_history
+```
+
+Now you can run `sudo kparam_history` to get a comprehensive view of all kernel parameter changes.
+
+
+# Auditing Tanium Client Impact on Kernel Parameters in OCI Environments
+
+Oracle Cloud Infrastructure (OCI) provides specific capabilities to monitor how OS maintenance tools like Tanium affect kernel parameters. Here's how OCI audits and manages these interactions:
+
+## 1. OCI's Native Monitoring of Kernel Parameter Changes
+
+### Cloud Guard Detectors
+- **Kernel Modification Detection**: OCI Cloud Guard includes built-in detectors that flag unauthorized kernel parameter changes
+- **Tanium-Specific Rules**: Can be configured to detect changes originating from Tanium processes
+- **Access**: OCI Console > Security > Cloud Guard > Detector Rules
+
+```bash
+# Sample CLI query for Tanium-related changes
+oci events event-list --compartment-id $COMPARTMENT_ID \
+--query "data[?contains(\"message\",'Tanium') && \
+contains(\"message\",'kernel.')].{time:\"time-generated\",message:\"message\"}" \
+--output table
+```
+
+## 2. Instance-Level Audit Configuration for Tanium
+
+### Enhanced Auditd Rules
+```bash
+# Tanium-specific kernel parameter audit rules
+sudo tee /etc/audit/rules.d/99-tanium-kernel.rules <<'EOF'
+# Track Tanium process sysctl calls
+-a always,exit -F arch=b64 -S sysctl -F exe=/opt/Tanium/TaniumClient/taniumclient -k tanium_kernel_changes
+# Monitor /proc/sys modifications by Tanium
+-w /proc/sys/ -p wa -k tanium_kernel_changes -F uid=0 -F exe=/opt/Tanium/TaniumClient/taniumclient
+EOF
+
+# Restart audit service
+sudo service auditd restart
+```
+
+### Monitoring Tanium's Kernel Interactions
+```bash
+# Real-time monitoring of Tanium's kernel access
+sudo stap -e '
+probe process("/opt/Tanium/TaniumClient/taniumclient").function("*sysctl*") {
+    printf("%s[%d] modified kernel parameter: %s\n", 
+           execname(), pid(), kernel_string(pointer_arg(1)))
+}
+'
+```
+
+## 3. OCI OS Management Service Integration
+
+### Compliance Reporting
+- **OCI OSMS** tracks all package changes including Tanium updates
+- **Kernel Parameter Baseline**: Maintains known-good states for comparison
+
+```bash
+# Check OS Management compliance status
+oci os-management managed-instance get --managed-instance-id $INSTANCE_ID \
+--query "data.\"non-compliant-packages\"" --output table
+```
+
+## 4. Tanium-Specific Kernel Protection
+
+### OCI Instance Configuration
+```bash
+# Create immutable kernel parameters
+sudo tee /etc/sysctl.d/99-oci-protected.conf <<'EOF'
+# OCI-protected parameters (cannot be modified by Tanium)
+kernel.panic = 60
+kernel.shmall = 4294967296
+kernel.shmmax = 68719476736
+EOF
+
+# Set immutable attribute
+sudo chattr +i /etc/sysctl.d/99-oci-protected.conf
+```
+
+## 5. Change Correlation Tools
+
+### OCI-Tanium Change Correlation Script
+```bash
+sudo tee /usr/local/bin/oci_tanium_kernel_monitor.sh <<'EOF'
+#!/bin/bash
+# Compare current params with OCI baseline
+OCI_BASELINE="/etc/oci-kernel-baseline.conf"
+TANIUM_LOG="/var/log/tanium_kernel_changes.log"
+
+# Generate current snapshot
+sysctl -a | sort > /tmp/current_params.conf
+
+# Compare with OCI baseline
+if [ -f "$OCI_BASELINE" ]; then
+    diff -u "$OCI_BASELINE" /tmp/current_params.conf | \
+    grep -E "^\+[^+]" | \
+    while read -r line; do
+        # Check if change correlates with Tanium activity
+        if grep -q "tanium" /var/log/audit/audit.log; then
+            echo "$(date) - Tanium-modified: ${line:1}" >> "$TANIUM_LOG"
+            # Optional: Revert critical changes
+            case "${line}" in
+                *"kernel.shm"*|*"kernel.sem"*)
+                    param=${line%%=*}
+                    ovalue=$(grep "^$param=" "$OCI_BASELINE")
+                    sudo sysctl -w "$param=${ovalue#*=}"
+                    ;;
+            esac
+        fi
+    done
+fi
+EOF
+
+# Run as cron job every 15 minutes
+(crontab -l 2>/dev/null; echo "*/15 * * * * /usr/local/bin/oci_tanium_kernel_monitor.sh") | crontab -
+```
+
+## 6. OCI Resource Manager for Enforcement
+
+### Terraform-based Kernel Protection
+```hcl
+resource "oci_core_instance" "secure_instance" {
+  # ... other configuration ...
+
+  # Kernel parameter enforcement
+  metadata = {
+    user_data = base64encode(<<-EOF
+      #!/bin/bash
+      # Protect critical parameters
+      echo "kernel.panic = 60" >> /etc/sysctl.d/99-oci-protected.conf
+      echo "kernel.exec-shield = 1" >> /etc/sysctl.d/99-oci-protected.conf
+      chmod 0444 /etc/sysctl.d/99-oci-protected.conf
+      sysctl --system
+      
+      # Tanium-specific exceptions
+      mkdir -p /etc/tanium/exclusions
+      echo "[KernelExclusions]" > /etc/tanium/exclusions/kernel.conf
+      echo "Param=kernel.panic" >> /etc/tanium/exclusions/kernel.conf
+      EOF
+    )
+  }
+}
+```
+
+## Key Monitoring Points
+
+1. **OCI Audit Logs**:
+   - Filter for `com.oraclecloud.computeapi.updateinstance` events
+   - Check for `kernel` or `sysctl` in event messages
+
+2. **Tanium-Specific Audits**:
+   ```bash
+   # View Tanium-related kernel changes
+   sudo ausearch -k tanium_kernel_changes | aureport -f -i
+   ```
+
+3. **OCI Console Monitoring**:
+   - Navigate to: Compute > Instance > (Select Instance) > Work Requests
+   - Filter for "Kernel Parameter" related work requests
+
+OCI provides robust auditing of kernel parameter changes, including those made by tools like Tanium, through a combination of Cloud Guard detectors, OS Management Service tracking, and infrastructure-level audit logs. For complete protection, implement both OCI-native controls and instance-level auditing.
+
+
