@@ -1024,3 +1024,18 @@ L’administrateur OCI excelle quand il :
 
 
 
+Résumé pour Audiences Non-TI
+L’administrateur OCI multi-instances est un rôle clé pour garantir le bon fonctionnement des applications métiers (comptabilité, reporting, gestion des identités) dans le cloud Oracle. Il assure la stabilité technique (maintenance, corrections, sauvegardes), la sécurité des données (masquage, accès contrôlés), et l’évolution des systèmes (déploiement de nouvelles fonctionnalités). Son travail repose sur une collaboration permanente avec les équipes financières, IT et développement pour prioriser les actions selon les besoins opérationnels (ex : clôtures mensuelles, urgences métiers).
+
+Contrairement à un support technique classique (répondant à des tickets isolés), ce rôle orchestre des processus complexes : synchronisation des environnements de test avec la production, gestion des impacts croisés entre applications, et adaptation continue aux demandes métiers. Sa réussite dépend de sa disponibilité, de sa vision globale (liens entre les systèmes), et de sa capacité à traduire les enjeux techniques en solutions concrètes pour les utilisateurs finaux.
+
+Points Clés à Retenir
+Pivot central : Il fait le lien entre la technique (cloud, bases de données) et les besoins métiers (finances, RH, analytics).
+
+Agilité indispensable : Doit jongler entre urgences, projets longs et demandes imprévues.
+
+Alignement sur les priorités métiers : Exemple : reporter une maintenance pour ne pas perturber une clôture trimestrielle.
+
+
+
+
