@@ -41,6 +41,9 @@ Les KPI sont essentiels pour piloter la performance dans presque tous les secteu
 
 Vous cherchez des KPI spécifiques pour un domaine en particulier ?
 
+
+---
+---
 Les **applications ERP (Enterprise Resource Planning)** et **EMP (Enterprise Management)** d’Oracle, déployées sur **Oracle Cloud Infrastructure (OCI)**, peuvent être évaluées à travers plusieurs **indicateurs mesurables (KPI)** liés à leurs performances opérationnelles, leur efficacité et leur impact business.  
 
 Voici les principaux **éléments mesurables** dans leur opération :  
@@ -117,6 +120,9 @@ Les KPI d’opération des ERP/EMP Oracle sur OCI couvrent :
 Vous cherchez des KPI spécifiques pour un module Oracle (ex : Financials, SCM, HCM) ou une industrie en particulier ?
 
 
+---
+---
+
 Les **KPI sur l'humain** (ou **"Human KPIs"**) sont-ils un objectif viable ? La réponse est **oui, mais sous certaines conditions**.  
 
 Les indicateurs liés aux collaborateurs sont essentiels pour évaluer la performance, l’engagement et le bien-être des équipes. Cependant, leur utilisation doit être **équilibrée et éthique**, car une approche trop rigide peut nuire à la motivation ou créer un climat de pression.  
@@ -183,6 +189,9 @@ Ils permettent de :
 
 Vous souhaitez des exemples spécifiques pour un secteur (tech, santé, etc.) ou une fonction (RH, management, etc.) ?
 
+
+---
+---
 Dans le **secteur bancaire**, particulièrement dans les **équipes TI (Technologies de l’Information)**, les **KPI humains** doivent mesurer à la fois **la performance technique**, **l’efficacité opérationnelle** et **le bien-être des employés**, tout en respectant les enjeux de **sécurité**, **conformité** et **innovation**.  
 
 Voici une analyse des **KPI humains pertinents** pour les TI bancaires, classés par catégorie :  
