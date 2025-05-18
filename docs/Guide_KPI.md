@@ -1268,6 +1268,92 @@ Cordialement,
 [Votre Nom]  
 [Votre Rôle]
 
+---
+# Charges Opérationnelles Clés
 
+### **📌 Charges Opérationnelles & Complexités des Infrastructures OCI**  
+*Pour une haute direction nouvellement en poste*  
 
+---
 
+### **🔧 Charges Opérationnelles Clés**  
+*(Tâches récurrentes nécessitant expertise et temps)*  
+
+| **Catégorie**          | **Exemples Concrets**                     | **Impact Métier**                          |  
+|-------------------------|-------------------------------------------|--------------------------------------------|  
+| **Gestion des Certificats** | Renouvellement SSL/TLS (50+ certificats/mois). | Risque d’indisponibilité ERP (coût : 500K€/h). |  
+| **Correctifs de Sécurité**  | Application mensuelle de 100+ patches OCI. | Vulnérabilités critiques (ex : Log4j).     |  
+| **Synchronisation EBS ↔ HFM** | Résolution des écarts de données (10h/semaine). | Retards de clôture financière.              |  
+| **Support Utilisateurs**   | 200+ tickets/mois (ex : accès OBIEE bloqués). | Productivité des équipes financières.       |  
+
+---
+
+### **🌐 Complexités de l’Infrastructure OCI**  
+*(Défis techniques impactant la résilience et les coûts)*  
+
+#### **1. Hybridation Cloud/On-Prem**  
+- **Problème** :  
+  - Modules legacy (ex : EBS) restent on-prem, générant des silos.  
+- **Conséquence** :  
+  - Coûts supplémentaires pour connecteurs custom (ex : 50K€/an).  
+
+#### **2. Sécurité Fragmentée**  
+- **Problème** :  
+  - Politiques IAM différentes entre OCI, EBS, et SaaS.  
+- **Conséquence** :  
+  - Risque de fuites de données (ex : comptes de service non révoqués).  
+
+#### **3. Coûts Cachés**  
+- **Problème** :  
+  - Instances OCI sous-utilisées (30% des ressources inactives).  
+- **Conséquence** :  
+  - Surcharge budgétaire (jusqu’à 200K€/an gaspillés).  
+
+#### **4. Dépendances Critiques**  
+- **Problème** :  
+  - Un échec de Control-M bloque 80% des batchs financiers.  
+- **Conséquence** :  
+  - Retard des rapports réglementaires (amendes potentielles).  
+
+---
+
+### **📉 Visualisation des Risques**  
+```mermaid  
+pie  
+    title Risques Majeurs OCI (2024)  
+    "Sécurité" : 35  
+    "Coûts" : 25  
+    "Disponibilité" : 20  
+    "Compatibilité" : 20  
+```  
+
+---
+
+### **💡 Recommandations pour la Direction**  
+1. **Prioriser** :  
+   - Un audit complet des coûts OCI (via OCI Cost Management).  
+   - Une feuille de route pour éliminer les silos (ex : migration EBS → OCI).  
+2. **Investir** :  
+   - Dans l’automatisation (ex : scripts Terraform pour les certificats).  
+   - En formation pour réduire les tickets récurrents.  
+3. **Suivre** :  
+   - 3 KPI critiques :  
+     - `Coût moyen/transaction cloud` (cible : -15%/an).  
+     - `Temps de résolution des incidents majeurs` (cible : < 4h).  
+     - `% de données chiffrées` (cible : 100%).  
+
+---
+
+### **📌 Message Clé**  
+*"Notre infrastructure OCI est puissante mais complexe. En comprenant ces charges et risques, nous pouvons transformer la TI en levier stratégique plutôt qu’en centre de coûts."*  
+
+**Prochaines étapes** :  
+- [ ] Briefing détaillé avec l’équipe TI (1h).  
+- [ ] Dashboard interactif OCI partagé (accès direction).  
+
+--- 
+
+**Pourquoi ce format ?**  
+- **Clarté** : Tableaux et diagrammes pour éviter le jargon.  
+- **Urgence** : Chiffres concrets (coûts, risques).  
+- **Actionnable** : Recommandations ciblées.
