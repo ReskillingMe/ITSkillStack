@@ -61,3 +61,64 @@ Les KPI peuvent être classés en plusieurs catégories :
 Vous pouvez consulter des guides détaillés sur les KPI [ici](https://www.appvizer.fr/magazine/operations/gestion-de-projet/indicateur-kpi) et [ici](https://asana.com/fr/resources/key-performance-indicator-kpi).  
 
 Souhaitez-vous un modèle de tableau de bord pour suivre ces indicateurs ? 😊
+
+## Peut-on dire que sans l’objectif stratégique, KPI n'a pas sa raison être?
+
+### **Réponse concise :**  
+**Oui, un KPI sans objectif stratégique n'a pas de raison d'être.**  
+
+#### **Pourquoi ?**  
+1. **Pas de boussole** :  
+   - Un KPI isolé (ex : *"Nombre de requêtes SQL/heure"*) ne guide aucune décision.  
+   - *Avec objectif* : *"Réduire de 20% le temps de traitement des rapports financiers"* → Le KPI devient un outil de pilotage.  
+
+2. **Risque de "vanity metrics"** :  
+   - Mesurer pour mesurer (ex : *"Taux d'utilisation CPU"*) sans lien avec la stratégie = **perte de temps**.  
+
+3. **Exemple concret OCI/ERP** :  
+   - ❌ *Sans objectif* : "Disponibilité EBS à 99%".  
+   - ✅ *Avec objectif* : "Garantir 99,9% de disponibilité pour éviter des pertes de 500K€/mois".  
+
+---
+
+### **Comment l'expliquer à la direction ?**  
+#### **Analogie efficace :**  
+*"Un KPI sans objectif, c'est comme un compteur de vitesse sans destination : vous savez à quelle vitesse vous roulez, mais pas si vous allez dans la bonne direction."*  
+
+#### **Sources formelles :**  
+- **Kaplan & Norton** (*Balanced Scorecard*) :  
+  *"Les KPI doivent être dérivés de la vision stratégique, pas définis en silo."*  
+- **Peter Drucker** :  
+  *"Ce qui se mesure se gère – à condition que la mesure serve un but clair."*  
+
+---
+
+### **Que faire en pratique ?**  
+1. **Lier chaque KPI à un objectif métier** :  
+   - *Exemple OCI* :  
+     - **Objectif** : "Réduire les coûts cloud de 15% en 2024".  
+     - **KPI** : *"Coût moyen/mois par instance Compute (cible : 200€)"*.  
+
+2. **Utiliser le template SMART** :  
+   ```markdown
+   - **S**pécifique : "Accélérer la clôture financière".  
+   - **M**esurable : "Temps EBS → HFM < 30 min".  
+   - **A**tteignable : Via l'optimisation OCI.  
+   - **R**elevant : Aligné sur la directive CFO.  
+   - **T**emporel : "D’ici Q3 2024".  
+   ```  
+
+3. **Éviter les pièges** :  
+   - Ne pas noyer la direction avec des KPI techniques (ex : IOPS, latence réseau).  
+   - Toujours poser : *"Quel problème métier ce KPI aide-t-il à résoudre ?"*  
+
+---
+
+### **Citation pour conclure :**  
+*"Un KPI sans objectif est comme un arbre sans racines : il peut sembler solide, mais il ne porte pas de fruits."*  
+
+**Action recommandée** :  
+- [ ] Réviser les KPI existants avec les équipes métiers.  
+- [ ] Supprimer ceux sans lien stratégique.
+
+
