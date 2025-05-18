@@ -25,5 +25,5 @@ Les KPI doivent être :
 Les KPI sont essentiels pour piloter efficacement une organisation et prendre des décisions basées sur des faits concrets.
 
 
-1- **Voici un **prospectus type** pour structurer la page de discussions autour des KPI et de la gestion des systèmes transverses, avec une approche professionnelle et engageante :
+1. Voici un **prospectus type** pour structurer la page de discussions autour des KPI et de la gestion des systèmes transverses, avec une approche professionnelle et engageante :
 
