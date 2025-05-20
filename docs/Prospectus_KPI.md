@@ -1,6 +1,6 @@
 ---
 
-# **Discussion : Optimisation des KPI et Systèmes Transverses**  
+#**Discussion : Optimisation des KPI et Systèmes Transverses**  
 *Pour les Administrateurs OCI/ERP/EPM*  
 
 ---
