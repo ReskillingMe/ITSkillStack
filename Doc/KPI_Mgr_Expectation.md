@@ -49,7 +49,8 @@ Bien que rare, une absence totale de KPIs TI est possible dans une institution f
 
 ---
 ---
-C’est une excellente question. Si le nouveau gestionnaire constate une absence de KPIs formels en TI, cela suggère que les anciens gestionnaires fonctionnaient selon des méthodes peu structurées. Voici plusieurs hypothèses sur leur mode de fonctionnement :  
+
+##C’est une excellente question. Si le nouveau gestionnaire constate une absence de KPIs formels en TI, cela suggère que les anciens gestionnaires fonctionnaient selon des méthodes peu structurées. Voici plusieurs hypothèses sur leur mode de fonctionnement :  
 
 ---
 
@@ -129,7 +130,8 @@ Si vous voulez des exemples de KPIs prioritaires pour commencer, je peux vous en
 
 ---
 ---
-Avec ces éléments supplémentaires, le tableau devient plus clair : **l’absence de KPIs formels en TI a pu persister précisément parce que la satisfaction des utilisateurs était élevée et qu’aucune crise majeure n’a exposé de lacunes**. Voici comment décrypter cette situation et ses risques :
+
+##Avec ces éléments supplémentaires, le tableau devient plus clair : **l’absence de KPIs formels en TI a pu persister précisément parce que la satisfaction des utilisateurs était élevée et qu’aucune crise majeure n’a exposé de lacunes**. Voici comment décrypter cette situation et ses risques :
 
 ---
 
@@ -213,7 +215,8 @@ Besoin d’aide pour prioriser les KPIs en fonction de vos applications spécifi
 
 ---
 ---
-Vous soulevez un point crucial : **et si le problème n’était pas l’absence de KPIs, mais la manière dont le nouveau gestionnaire les aborde ?** Voici une analyse équilibrée de cette thèse, avec des pistes pour vérifier sa validité.
+
+##Vous soulevez un point crucial : **et si le problème n’était pas l’absence de KPIs, mais la manière dont le nouveau gestionnaire les aborde ?** Voici une analyse équilibrée de cette thèse, avec des pistes pour vérifier sa validité.
 
 ---
 
@@ -359,8 +362,10 @@ Le problème n’est pas l’absence de KPIs, mais **une méconnaissance des cap
 **Prochaine étape** : Lui proposer une session avec votre architecte OCI ou un partenaire Oracle pour faire le pont. Cela pourrait résoudre 80% des tensions en révélant l’existant.  
 
 Vous voulez des exemples de dashboards OCI pour commencer ? Je peux vous orienter vers des templates clés.
+
 ---
 ---
+
 ### **Analyse du Problème : Un Gestionnaire Trop Centré sur ServiceNow (et ses Limites)**  
 Le nouveau gestionnaire commet une **erreur classique** : il veut tout piloter via **ServiceNow** (notamment la CMDB), alors que votre écosystème Oracle (OCI, OEM) ne peut pas être entièrement cartographié ou monitoré depuis cet outil. Voici pourquoi cette approche est problématique, et comment la corriger.
 
@@ -434,6 +439,7 @@ Le nouveau gestionnaire doit comprendre que :
 **Prochaine étape** : Organiser un atelier avec un expert OCI/OEM pour lui montrer ce que ServiceNow ne peut pas faire – et comment exploiter les bons outils.  
 
 Vous voulez des exemples d’intégrations légères OCI → ServiceNow ? Je peux vous partager des cas concrets.
+
 ---
 ---
 ### **Comment Donner de la Visibilité sur le Travail de l’Équipe Systèmes (Admin, OCI, OEM) – Sans Tout Passer par ServiceNow**  
@@ -530,8 +536,10 @@ Le gestionnaire a besoin de visibilité, mais **pas nécessairement via ServiceN
 - Montrer que c’est plus rapide que de forcer la CMDB.  
 
 Vous voulez un exemple de dashboard ? Je peux vous envoyer des mockups.
+
 ---
 ---
+
 ### **Solution Intégrée : Exploiter TOUTES les Sources (MOS, OCI, OEM + ServiceNow) pour une Visibilité Complète**  
 
 Le gestionnaire veut une **vision unifiée** du travail des admins systèmes, mais se heurte à la dispersion des données entre :  
@@ -636,8 +644,10 @@ Voici comment **consolider ces sources sans tout dupliquer dans ServiceNow**.
 2. Monter un POC avec 1-2 sources (ex. : OCI + MOS).  
 
 Vous voulez un exemple de tableau de bord ? Je peux vous envoyer un modèle.
+
 ---
 ---
+
 ### **Approches par IA pour Recenser Automatiquement les Activités SysAdmin (OCI, OEM, MOS, etc.)**  
 
 Oui, il existe des solutions **IA/ML** pour automatiser le suivi des activités des administrateurs systèmes, surtout dans un environnement complexe comme le vôtre (OCI, OEM, MOS). Voici comment les implémenter efficacement.
@@ -739,8 +749,10 @@ L’IA peut **automatiser 60-80% du recensement des activités SysAdmin**, surto
 - Si vous préférez une solution clé en main, évaluer **Oracle AIOps** ou **ServiceNow AI**.  
 
 Vous voulez que je creuse un cas précis ?
+
 ---
 ---
+
 ### **Suivi des Contributions SysAdmin via IA : Billets d’Incidents, Problèmes et Projets**  
 
 Pour **traquer automatiquement l’impact des administrateurs systèmes** dans la gestion des incidents, problèmes et projets, une approche **IA + analyse des données existantes** (ServiceNow, MOS, OCI, OEM) est efficace. Voici comment faire.
@@ -854,6 +866,7 @@ Je peux vous aider à construire un POC – quel outil préférez-vous ? (Python
 
 ---
 ---
+
 ### **Synthèse Complète : Automatisation du Suivi des Activités SysAdmin via IA**  
 
 #### **Contexte**  
